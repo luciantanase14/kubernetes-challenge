@@ -1,0 +1,8 @@
+# Ignore Helm-related files and Kubernetes artifacts
+*.tgz
+*.lock
+.helm/
+.kube/
+.env
+node_modules/
+.DS_Store

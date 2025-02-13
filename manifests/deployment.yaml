@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-hello-world
+  labels:
+    app: nodejs-hello-world
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nodejs-hello-world
+  template:
+    metadata:
+      labels:
+        app: nodejs-hello-world
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - nodejs-hello-world
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: nodejs-hello-world
+        image: pvermeyden/nodejs-hello-world
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config/config.json
+          subPath: config.json
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 15
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config

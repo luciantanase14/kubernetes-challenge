@@ -1,0 +1,10 @@
+replicaCount: 3
+image:
+  repository: pvermeyden/nodejs-hello-world
+ingress:
+  host: hello.example.com
+pdb:
+  minAvailable: 2
+config:
+  setting1: "value1"
+  setting2: "value2"
